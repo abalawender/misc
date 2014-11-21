@@ -10,9 +10,10 @@
     27  - alarm */
 
 
+//.globl _start
 .globl main
-
 main:
+_start:
     movl $4, %eax   
     movl $1, %ebx   
     movl $msg, %ecx 
@@ -25,6 +26,7 @@ main:
     leal (%esp), %ebx
     int $0x80
 
+//jmp _par    
     movl $2, %eax
     int $0x80
     or %eax, %eax
@@ -41,26 +43,12 @@ main:
     int $0x80 
 
     movl $6, %eax
-    //pop %ebx
     int $0x80
 
     movl $6, %eax
     pop %ebx
     int $0x80
 
-/*    push $65
-    movl $3, %eax
-    movl $0, %ebx
-    leal (%esp), %ecx
-    movl $4, %edx
-    int $0x80
-
-    movl $4, %eax
-    movl $1, %ebx
-    leal (%esp), %ecx
-    movl $4, %edx
-    int $0x80
-*/
     pushl %ebp
     movl %esp, %ebp
     subl $0x8, %esp
@@ -81,90 +69,55 @@ main:
 
     leal -8(%ebp), %edx
     int $0x80
+
     // error happened, f*ck
     jmp _end
-    _par:
 
+_par:
     movl $6, %eax
     pop %ebx
     int $0x80
 
-    //addl $0x50, %esp
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
-    push $0
+    subl $0x50, %esp            /* allocate 80B for filename */
+
     movl $3, %eax
     movl $0, %ebx
     leal (%esp), %ecx
     movl $0x50, %edx
     int $0x80
-    
-    movl %eax, %edx
 
-    leal (%esp), %ebx
-    subl $0x4f, %ebx
-    addl %edx, %ebx
-    movl $0, (%ebx)
+    movb $0, -1(%esp, %eax, 1)  /* change last character (\n) to null */
 
-    movl $4, %eax
-    movl $1, %ebx
-    leal (%esp), %ecx
-    //movl $edx, %edx - write as much as was read
-    movl $0x50, %edx
-    int $0x80
-
-    movl $5, %eax
+    movl $5, %eax               /* open */
     leal (%esp), %ebx
     movl $0, %ecx
     int $0x80
-    subl $0x50, %esp
-    push %eax
+
+    addl $0x50, %esp            /* free 80B - filename */
+    push %eax                   /* save file descriptor */
+    cmp $0, %eax
+    jb _end
 
 _copy:
-    //movl %eax, %ebx /* fd */
     movl $3, %eax
-    //movl %esp, %ebx
-    movl $3, %ebx
-    addl $0x50, %esp
-    leal (%esp), %ecx
-    movl $0x50, %edx
+    movl (%esp), %ebx
+    leal -0xFF(%esp), %ecx      /* use 256B on stack */
+    movl $0xFF, %edx
     int $0x80
 
-    movl %eax, %edx /*save */
-    movl $4, %eax
-    movl $4, %ebx
-    //ecx ok
-    //movl %edx
+    movl %eax, %edx             /* store length */
+    movl $4, %eax               /* write to pipe */
+    movl 4(%esp), %ebx
+    //ecx & edx are ok
     int $0x80
-    subl $0x50, %esp
-    or %edx, %edx
-    jne _copy
-
+    cmp $0, %eax
+    jg _copy
 
     movl $6, %eax
     movl $4, %ebx
     int $0x80
     
-    
-    _end:
-
+_end:
     push $0
     push $30
     movl $162, %eax
@@ -180,8 +133,6 @@ _copy:
     movl $11, %edx  
     int $0x80
 
-    
-
     movl $1, %eax
     movl $0, %ebx   
     int $0x80 
@@ -189,12 +140,6 @@ msg:
 .string "Hello world!\n"
 msg2:
 .string "Bye world!\n"
-fmt:
-.string "%d, %d\n"
-parent:
-.string "PA\n"
-child:
-.string "CH\n"
 display:
 .string "/usr/bin/display"
 env:
