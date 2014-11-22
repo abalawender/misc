@@ -6,14 +6,16 @@
     11  - execve
     41  - dup
     42  - pipe
-    162 - nanosleep
-    27  - alarm */
+    162 - nanosleep */
 
+/*
+IPC example, sends image to /usr/bin/display via pipe
+	by Adam Balawender, Nov 20 2014
 
-//.globl _start
+    compile with: gcc -gstabs display.s -o display -g -m32 */
+
 .globl main
 main:
-_start:
     movl $4, %eax   
     movl $1, %ebx   
     movl $msg, %ecx 
@@ -26,7 +28,6 @@ _start:
     leal (%esp), %ebx
     int $0x80
 
-//jmp _par    
     movl $2, %eax
     int $0x80
     or %eax, %eax
