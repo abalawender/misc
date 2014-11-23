@@ -3,6 +3,7 @@
     4   - write
     5   - open
     6   - close
+    7   - waitppid
     11  - execve
     41  - dup
     42  - pipe
@@ -19,7 +20,7 @@ main:
     movl $4, %eax   
     movl $1, %ebx   
     movl $msg, %ecx 
-    movl $13, %edx  
+    movl $17, %edx  
     int $0x80
 
     push $0
@@ -119,14 +120,11 @@ _copy:
     int $0x80
     
 _end:
-    push $0
-    push $30
-    movl $162, %eax
-    leal (%esp), %ebx
-    movl $0, %ecx
+    movl $7, %eax
+    movl $-1, %ebx
+    movl %esp, %ecx
+    movl $0, %edx
     int $0x80
-    pop %ebx
-    pop %ebx
 
     movl $4, %eax   
     movl $1, %ebx   
@@ -138,7 +136,7 @@ _end:
     movl $0, %ebx   
     int $0x80 
 msg:
-.string "Hello world!\n"
+.string "Path to image\n>: "
 msg2:
 .string "Bye world!\n"
 display:
