@@ -5,6 +5,7 @@
  Returns:       0 if word matches the hash, 1 otherwise
 	by Adam Balawender, Dec 21 2014
 */
+#include <stdio.h>
 #include <openssl/md5.h>
 void decode(char *hash, long long out[2]) {
     int i = 0;
@@ -27,6 +28,8 @@ int main(int argc, char **argv) {
 
     long long o2[2] = {0};
     MD5(argv[1], _strlen(argv[1]), (char*)o2);
+    
+    printf("%llx%llx\n", o1[0], o1[1] );
 
     return (o1[0] != o2[0] || o1[1] != o2[1]);
 }
