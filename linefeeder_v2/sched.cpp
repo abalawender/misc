@@ -1,3 +1,7 @@
+/*  Simple tast scheduling program
+ *	     by Adam Balawender, Jan 15, 2015
+ */
+
 #include <iostream>
 #include <vector>
 #include <list>

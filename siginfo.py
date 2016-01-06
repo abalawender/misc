@@ -19,16 +19,16 @@ for pid in pids:
 	try:
 		cmdline = open( os.path.join( proc, pid, 'cmdline' )).read().replace('\0', ' ')
 		status = open( os.path.join( proc, pid, 'status' )).read()
-		
+
 		match = re.search(pattern, status)
 		if not match: continue
 		sigblk = match.expand(r'\1')
-		
+
 		print(str(pid) + '\t| ' + cmdline + " | ", end='')
 		sig = int(sigblk, 16)
 		s = ", ".join ( [signals.get(i+1) for i in range( 8 )\
 						if sig & 1<<i and signals.get(i+1) ] )
 		print(s)
-		
+
 	except IOError:
 		pass
